@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../../model/location/locations.dart';
 import '../../../../model/ride/ride_pref.dart';
 import '../../../theme/theme.dart';
@@ -12,7 +11,7 @@ import 'ride_pref_input_tile.dart';
 
 ///
 /// A Ride Preference From is a view to select:
-///   - A depcarture location
+///   - A departure location
 ///   - An arrival location
 ///   - A date
 ///   - A number of seats
@@ -46,7 +45,16 @@ class _RidePrefFormState extends State<RidePrefForm> {
   @override
   void initState() {
     super.initState();
+    _initializeFormAttributes();
+  }
 
+  @override
+  void didUpdateWidget(covariant RidePrefForm oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _initializeFormAttributes();
+  }
+
+  void _initializeFormAttributes() {
     if (widget.initialPreference != null) {
       RidePreference current = widget.initialPreference!;
       departure = current.departure;
@@ -120,7 +128,7 @@ class _RidePrefFormState extends State<RidePrefForm> {
 
   void onSwappingLocationPressed() {
     setState(() {
-      // We switch only if both departure and arrivate are defined
+      // We switch only if both departure and arrival are defined
       if (departure != null && arrival != null) {
         Location temp = departure!;
         departure = Location.copy(arrival!);
@@ -135,13 +143,10 @@ class _RidePrefFormState extends State<RidePrefForm> {
   String get departureLabel =>
       departure != null ? departure!.name : "Leaving from";
   String get arrivalLabel => arrival != null ? arrival!.name : "Going to";
-
   bool get showDeparturePLaceHolder => departure == null;
   bool get showArrivalPLaceHolder => arrival == null;
-
   String get dateLabel => DateTimeUtils.formatDateTime(departureDate);
   String get numberLabel => requestedSeats.toString();
-
   bool get switchVisible => arrival != null && departure != null;
 
   // ----------------------------------
