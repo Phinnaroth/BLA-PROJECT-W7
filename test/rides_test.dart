@@ -2,7 +2,7 @@
 import 'package:W7/model/location/locations.dart';
 import 'package:W7/model/ride/ride.dart';
 import 'package:W7/model/ride/ride_pref.dart';
-import 'package:W7/repository/mock/mock_rides_repository.dart';
+import 'package:W7/data/repository/mock/mock_rides_repository.dart';
 import 'package:W7/service/rides_service.dart';
 
 void main() {

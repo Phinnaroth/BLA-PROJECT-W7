@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+
+import '../../model/ride/ride_pref.dart';
 import '../repository/ride_preferences_repository.dart';
-import '../model/ride/ride_pref.dart';
+import 'async_value.dart';
 
 class RidesPreferencesProvider extends ChangeNotifier {
   RidePreference? _currentRidePreference;
-  List<RidePreference> _pastRidePreferences = [];
 
   final RidePreferencesRepository repository;
 
@@ -14,33 +15,37 @@ class RidesPreferencesProvider extends ChangeNotifier {
 
   RidePreference? get currentRidePreference => _currentRidePreference;
 
+  // wrap past preferences with async value
+  late AsyncValue<List<RidePreference>> pastPreferences;
+
   // fetch the past ride preferences from repo
-  void _fetchPastRidePreferences() {
-    try {
-      _pastRidePreferences = repository.getPastPreferences();
-      notifyListeners();
-    } catch (e) {
-      print(e);
-    }
+  Future<void> _fetchPastRidePreferences() async{
+     // 1-  Handle loading 
+    pastPreferences = AsyncValue.loading(); 
+    notifyListeners(); 
+
+    try { 
+    // 2   Fetch data 
+    List<RidePreference> pastPrefs = await repository.getPastPreferences();
+
+    // 3  Handle success
+    pastPreferences = AsyncValue.success(pastPrefs);
+    
+    // 4  Handle error 
+    } catch (error) {
+      pastPreferences = AsyncValue.error(error);
+    } 
+    notifyListeners(); 
   }
 
-  void setCurrentRidePreference(RidePreference pref) {
-    if (_currentRidePreference != pref) {
+  void setCurrentRidePreference(RidePreference pref){
       _currentRidePreference = pref;
-      _addPreference(pref);
       notifyListeners();
-    }
   }
 
   // update all past pref
-  void _addPreference(RidePreference preference) {
-    if (!_pastRidePreferences.contains(preference)) {
-      _pastRidePreferences.add(preference);
-      repository.addPreference(preference);
-    }
+  Future<void> _addPreference(RidePreference preference) async {
+    await repository.addPreference(preference);
+    _fetchPastRidePreferences(); 
   }
-
-  // past ride preferences returned in reverse order new to old
-  List<RidePreference> get pastRidePreferences =>
-      _pastRidePreferences.reversed.toList();
 }
