@@ -44,8 +44,9 @@ class RidesPreferencesProvider extends ChangeNotifier {
   }
 
   // update all past pref
-  Future<void> _addPreference(RidePreference preference) async {
+  Future<void> addPreference(RidePreference preference) async {
     await repository.addPreference(preference);
     _fetchPastRidePreferences(); 
+    notifyListeners();
   }
 }

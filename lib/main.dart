@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'data/repository/local/local_ride_preference_reposity.dart';
 import 'ui/provider/ride_pref_provider.dart';
 import 'data/repository/mock/mock_locations_repository.dart';
 import 'data/repository/mock/mock_rides_repository.dart';
@@ -15,8 +16,26 @@ void main() {
   LocationsService.initialize(MockLocationsRepository());
   RidesService.initialize(MockRidesRepository());
 
+  MockRidePreferencesRepository mockRidePreferencesRepository = MockRidePreferencesRepository();
+  LocalRidePreferenceRepository localRidePreferenceRepository = LocalRidePreferenceRepository();
   // 2- Run the UI
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => RidesPreferencesProvider(
+            repository: mockRidePreferencesRepository, 
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => RidesPreferencesProvider(
+            repository: localRidePreferenceRepository, 
+          ),
+        ), 
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -24,19 +43,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider( // Use MultiProvider
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => RidesPreferencesProvider(
-            repository: MockRidePreferencesRepository(), 
-          ),
-        ),
-      ],
-      child: MaterialApp(
+    return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: appTheme,
         home: const Scaffold(body: RidePrefScreen()),
-      ),
     );
   }
 }
